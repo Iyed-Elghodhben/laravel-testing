@@ -2,65 +2,68 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ticket;
+use App\Services\TicketService;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
+use Illuminate\Http\JsonResponse;
 
 class TicketController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Inject TicketService via constructor
      */
-    public function index()
+    private TicketService $ticketService;
+
+    public function __construct(TicketService $ticketService)
     {
-        //
+        $this->ticketService = $ticketService;
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Create a new ticket for an event
      */
-    public function create()
+    public function store(StoreTicketRequest $request, int $eventId): JsonResponse
     {
-        //
+        $ticket = $this->ticketService->createTicket($eventId, $request->validated());
+
+        return response()->json([
+            'message' => 'Ticket created successfully',
+            'data' => $ticket
+        ], 201);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update a ticket
      */
-    public function store(StoreTicketRequest $request)
+    public function update(UpdateTicketRequest $request, int $ticketId): JsonResponse
     {
-        //
+        $ticket = $this->ticketService->updateTicket($ticketId, $request->validated());
+
+        return response()->json([
+            'message' => 'Ticket updated successfully',
+            'data' => $ticket
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * Delete a ticket
      */
-    public function show(Ticket $ticket)
+    public function destroy(int $ticketId): JsonResponse
     {
-        //
+        try {
+            $this->ticketService->deleteTicket($ticketId);
+
+            return response()->json([
+                'message' => 'Ticket deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Cannot delete ticket',
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Ticket $ticket)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateTicketRequest $request, Ticket $ticket)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Ticket $ticket)
-    {
-        //
-    }
 }

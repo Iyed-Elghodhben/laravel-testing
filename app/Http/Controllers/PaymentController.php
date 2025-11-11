@@ -2,65 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
+use App\Services\PaymentService;
 use App\Http\Requests\StorePaymentRequest;
-use App\Http\Requests\UpdatePaymentRequest;
+use Illuminate\Http\JsonResponse;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private PaymentService $paymentService)
     {
-        //
     }
 
     /**
-     * Show the form for creating a new resource.
+     * POST /api/bookings/{id}/payment
      */
-    public function create()
+    public function pay(StorePaymentRequest $request, int $bookingId): JsonResponse
     {
-        //
+        try {
+            $payment = $this->paymentService->processPayment($bookingId, $request->validated());
+
+            return response()->json([
+                'message' => 'Payment successful',
+                'payment' => $payment
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * GET /api/payments/{id}
      */
-    public function store(StorePaymentRequest $request)
+    public function show(int $paymentId): JsonResponse
     {
-        //
-    }
+        $payment = $this->paymentService->getPayment($paymentId);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Payment $payment)
-    {
-        //
-    }
+        if (!$payment) {
+            return response()->json(['error' => 'Payment not found'], 404);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Payment $payment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePaymentRequest $request, Payment $payment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Payment $payment)
-    {
-        //
+        return response()->json($payment, 200);
     }
 }

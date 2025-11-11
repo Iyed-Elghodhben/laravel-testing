@@ -6,6 +6,7 @@ use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\PaymentController;
 
 
 
@@ -23,6 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('events', [EventController::class, 'Events']);
     Route::get('events/{id}', [EventController::class, 'getEventById']);
 
+    Route::post('/bookings/{id}/payment', [PaymentController::class, 'pay']);
+    Route::get('/payments/{id}', [PaymentController::class, 'show']);
+
 
 
     Route::middleware('role:organizer')->group(function () {
@@ -36,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:organizer')->group(function () {
         Route::post('events/{event_id}/tickets', [TicketController::class, 'store']);
         Route::put('tickets/{id}', [TicketController::class, 'update']);
-        Route::delete('tickets/{id}', [TicketController::class, 'delete']);
+        Route::delete('tickets/{id}', [TicketController::class, 'destroy']);
     });
 
     // Customer routes

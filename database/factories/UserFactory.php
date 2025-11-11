@@ -28,8 +28,40 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'phone' => $this->faker->phoneNumber(),
+            'role' => fake()->randomElement(['admin', 'organizer', 'customer']),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Indicate that the model should be an admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+
+    /**
+     * Indicate that the model should be an organizer.
+     */
+    public function organizer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'organizer',
+        ]);
+    }
+
+    /**
+     * Indicate that the model should be a customer.
+     */
+    public function customer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'customer',
+        ]);
     }
 
     /**

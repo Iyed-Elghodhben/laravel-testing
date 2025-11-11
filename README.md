@@ -16,6 +16,13 @@ A Laravel-based API for managing events, tickets, and bookings with **role-based
 - [Testing](#testing)
 
 ---
+## Environment / System Requirements
+
+- **PHP:** 8.2.12 (CLI) (built: Oct 24 2023 21:15:15) (ZTS Visual C++ 2019 x64)  
+- **Composer:** 2.8.12  
+- **Laravel Framework:** 12.37.0  
+
+### PHP Details
 
 ## **Installation**
 

@@ -20,6 +20,8 @@ class BookingService
             'status' => 'confirmed', // initially confirmed
         ]);
 
+
+
         // Send notification using queue
         $booking->user->notify((new BookingConfirmed($booking))->delay(now()->addSeconds(5)));
 

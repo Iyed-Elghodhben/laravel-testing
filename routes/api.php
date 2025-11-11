@@ -34,7 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Tickets (Organizer only)
     Route::middleware('role:organizer')->group(function () {
-        Route::get('my-tickets', [TicketController::class, 'myTickets']);
+        Route::post('events/{event_id}/tickets', [TicketController::class, 'store']);
+        Route::put('tickets/{id}', [TicketController::class, 'update']);
+        Route::delete('tickets/{id}', [TicketController::class, 'delete']);
     });
 
     // Customer routes

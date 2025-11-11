@@ -1,6 +1,6 @@
 # Event Booking API
 
-A Laravel-based API for managing events, tickets, and bookings with **role-based access**, notifications, queues, and caching.
+A Laravel-based API for managing events, tickets, bookings, and payments with **role-based access**, notifications, queues, caching, and unit testing.
 
 ---
 
@@ -12,17 +12,19 @@ A Laravel-based API for managing events, tickets, and bookings with **role-based
   - [Authentication](#authentication)
   - [Events](#events)
   - [Tickets & Bookings](#tickets--bookings)
+  - [Payments](#payments)
 - [Postman Collection](#postman-collection)
 - [Testing](#testing)
 
 ---
+
 ## Environment / System Requirements
 
-- **PHP:** 8.2.12 (CLI) (built: Oct 24 2023 21:15:15) (ZTS Visual C++ 2019 x64)  
+- **PHP:** 8.2.12 (CLI)  
 - **Composer:** 2.8.12  
 - **Laravel Framework:** 12.37.0  
 
-### PHP Details
+---
 
 ## **Installation**
 
@@ -31,109 +33,98 @@ Clone the repository:
 ```bash
 git clone <your-repo-url>
 cd <project-folder>
-
 Install dependencies:
+
+bash
+Copier le code
 composer install
 npm install
 Copy .env.example to .env and configure your database:
+
+bash
+Copier le code
 cp .env.example .env
-Generate app key:
 php artisan key:generate
-
 Setup
-
 Run migrations and seeders:
 
+bash
+Copier le code
+php artisan migrate --seed
 (Optional) Publish queue tables:
+
+bash
+Copier le code
 php artisan queue:table
 php artisan migrate
-
 php artisan queue:work
-
-
 Email Configuration
+To send booking confirmation emails, configure SMTP in .env:
 
-To send booking confirmation emails, configure your SMTP settings in .env:
-
+ini
+Copier le code
 MAIL_MAILER=smtp
-MAIL_HOST=smtp.mailtrap.io        # Example for Mailtrap (dev/test)
+MAIL_HOST=smtp.mailtrap.io        # Example for Mailtrap
 MAIL_PORT=587
 MAIL_USERNAME=your_username
 MAIL_PASSWORD=your_password
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=no-reply@example.com
 MAIL_FROM_NAME="Event Booking API"
-
-
-Notes:
-
-For local testing, you can use Mailtrap
- or MailHog
-.
-
-For production, use your email provider SMTP credentials (Gmail, SendGrid, etc.).
-
-Make sure php artisan queue:work is running to process email notifications queued by Laravel.
-
 Running the Project
+Start the Laravel server:
 
-Start the Laravel development server:
+bash
+Copier le code
 php artisan serve
 API Endpoints
 Authentication
+Register: POST /api/register
+Required: name, email, password, password_confirmation, role (customer, organizer, admin)
 
-Register POST /api/register
+Login: POST /api/login
+Returns token for authentication
 
-Login POST /api/login
-
-Logout POST /api/logout
-
-Notes:
-
-register requires: name, email, password, password_confirmation, role (customer, organizer, admin).
-
-login returns a token for authentication.
+Logout: POST /api/logout
 
 Events
+Get Events: GET /api/events
+Optional filters: search, date, location, per_page
+Uses CommonQueryScopes trait with filterByDate() and searchByTitle()
 
-Get Events GET /api/events
-Optional filters: search, date, location, per_page.
+Create Event: POST /api/events (Organizer only)
 
-Create Event POST /api/events (Organizer only)
+Update Event: PUT /api/events/{id} (Organizer only)
 
-Update Event PUT /api/events/{id} (Organizer only)
+Delete Event: DELETE /api/events/{id} (Organizer only)
 
-Delete Event DELETE /api/events/{id} (Organizer only)
 Tickets & Bookings (Customer)
-
-Book Ticket POST /api/tickets/{id}/bookings
+Book Ticket: POST /api/tickets/{id}/bookings
 Body: { "quantity": 2 }
 
-Get My Bookings GET /api/bookings
+Get My Bookings: GET /api/bookings
 
-Cancel Booking PUT /api/bookings/{id}/cancel
+Cancel Booking: PUT /api/bookings/{id}/cancel
 
-Note: Double booking the same ticket is prevented by middleware.
+Note: Middleware prevents double booking of the same ticket.
 
-Testing
+Payments
+Pay for Booking: POST /api/bookings/{booking_id}/payment
+Body example:
 
-Run feature tests:
+json
+Copier le code
+{
+  "booking_id": 1,
+  "amount": 150.50
+}
+Handled via PaymentService
 
-php artisan test --testsuite=Feature
-User registration & login
+Validates booking_id exists and amount is numeric
 
-Event creation (organizer)
+Updates booking status to confirmed
 
-Ticket booking (customer)
+Stores payment record with status = confirmed
 
-Double booking prevention
+View Payment Details: GET /api/payments/{payment_id}
 
-Queue Worker: Make sure php artisan queue:work is running to process notifications.
-
-Notes
-
-Roles: admin, organizer, customer.
-
-Notifications are queued using Laravel’s queue system.
-
-Frequently accessed events are cached for performance.

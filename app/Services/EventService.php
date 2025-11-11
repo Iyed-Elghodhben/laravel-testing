@@ -10,24 +10,18 @@ use Illuminate\Support\Facades\Cache;
 class EventService
 {
 
-     public function getEvents(array $filters, int $perPage = 10)
+    /**
+     * Retourner la liste des événements avec filtres et pagination
+     */
+    public function getEvents(array $filters, int $perPage = 10)
     {
         $cacheKey = 'events_list_' . md5(json_encode($filters));
 
-        return Cache::remember($cacheKey, 60*5, function () use ($filters, $perPage) {
-            $query = Event::query();
-
-            if (!empty($filters['search'])) {
-                $query->where('title', 'like', '%' . $filters['search'] . '%');
-            }
-
-            if (!empty($filters['date'])) {
-                $query->whereDate('date', $filters['date']);
-            }
-
-            if (!empty($filters['location'])) {
-                $query->where('location', 'like', '%' . $filters['location'] . '%');
-            }
+        return Cache::remember($cacheKey, 60 * 5, function () use ($filters, $perPage) {
+            $query = Event::query()
+                ->searchByTitle($filters['search'] ?? null)
+                ->filterByDate($filters['date'] ?? null)
+                ->filterByLocation($filters['location'] ?? null);
 
             return $query->orderBy('id')->cursorPaginate($perPage);
         });

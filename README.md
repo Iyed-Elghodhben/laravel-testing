@@ -128,3 +128,29 @@ Stores payment record with status = confirmed
 
 View Payment Details: GET /api/payments/{payment_id}
 
+Testing
+
+Run feature tests:
+
+php artisan test --testsuite=Feature
+
+
+Includes:
+
+User registration & login
+
+Event creation (organizer)
+
+Ticket booking (customer)
+
+Double booking prevention
+
+Payment processing
+
+Viewing payment details
+
+Queue Worker: Make sure php artisan queue:work is running to process notifications
+
+Run unit tests for PaymentService:
+
+php artisan test --testsuite=Unit

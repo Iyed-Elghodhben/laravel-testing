@@ -154,3 +154,16 @@ Queue Worker: Make sure php artisan queue:work is running to process notificatio
 Run unit tests for PaymentService:
 
 php artisan test --testsuite=Unit
+
+
+
+### Docker
+- Added Docker and Docker Compose setup for Laravel API.
+- Configured `docker-compose.yml` with:
+  - PHP 8.2 + Composer
+  - MySQL 8
+  - phpMyAdmin for DB management
+  - Laravel artisan commands ready to run
+- Updated README with Docker instructions and commands to start the API.
+
+
